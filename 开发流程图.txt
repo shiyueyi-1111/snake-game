@@ -1,0 +1,117 @@
+flowchart TB
+    subgraph 阶段1["1️⃣ 需求管理阶段"]
+        A1[产品经理收集需求] --> A2[需求评审会议]
+        A2 --> A3[输出PRD文档]
+        A3 --> A4[技术可行性评估]
+        A4 --> A5[创建任务/工单<br/>Jira/禅道/飞书等]
+    end
+
+    subgraph 阶段2["2️⃣ 任务分配阶段"]
+        B1[任务分配给研发] --> B2[领取任务]
+        B2 --> B3[需求澄清<br/>有疑问及时沟通]
+        B3 --> B4[工时评估]
+        B4 --> B5[确认排期]
+    end
+
+    subgraph 阶段3["3️⃣ 开发准备阶段"]
+        C1[从main切功能分支<br/>git checkout -b feature/xxx] --> C2[本地环境准备]
+        C2 --> C3[确认依赖安装]
+        C3 --> C4[阅读相关代码]
+        C4 --> C5[技术方案设计<br/>复杂功能先写设计文档]
+    end
+
+    subgraph 阶段4["4️⃣ 编码阶段"]
+        D1[编写业务代码] --> D2[本地调试运行]
+        D2 --> D3[自测功能是否正常]
+        D3 -->|有问题| D4[修复bug]
+        D4 --> D1
+        D3 -->|正常| D5[编写单元测试]
+        D5 --> D6[运行单元测试<br/>npm run test:unit]
+        D6 -->|失败| D7[修复测试/代码]
+        D7 --> D6
+        D6 -->|通过| D8[代码规范检查<br/>ESLint/Prettier]
+        D8 -->|不通过| D9[自动修复或手动修改]
+        D9 --> D8
+        D8 -->|通过| D10[提交到本地<br/>git commit]
+    end
+
+    subgraph 阶段5["5️⃣ 代码推送阶段"]
+        E1[推送到远程<br/>git push origin feature/xxx] --> E2[创建Merge Request]
+        E2 --> E3[填写MR描述<br/>标题/变更说明/截图/关联Issue]
+        E3 --> E4[指定审查者<br/>Reviewer + Assignee]
+    end
+
+    subgraph 阶段6["6️⃣ CI自动化阶段<br/>GitLab CI/GitHub Actions"]
+        F1[触发流水线] --> F2[代码检出<br/>Checkout]
+        F2 --> F3[安装依赖<br/>npm ci]
+        F3 --> F4[代码规范扫描]
+        F4 -->|失败| F5[阻断，需修复]
+        F5 --> F1
+        F4 -->|通过| F6[单元测试]
+        F6 -->|失败| F7[阻断，需修复]
+        F7 --> F1
+        F6 -->|通过| F8[安全扫描<br/>SAST/SCA/依赖漏洞]
+        F8 -->|高危漏洞| F9[阻断，必须修复]
+        F9 --> F1
+        F8 -->|通过| F10[构建打包<br/>Build]
+        F10 -->|失败| F11[阻断，检查构建错误]
+        F11 --> F1
+        F10 -->|成功| F12[生成测试报告]
+    end
+
+    subgraph 阶段7["7️⃣ 代码审查阶段"]
+        G1[审查者收到通知] --> G2[阅读MR描述]
+        G2 --> G3[查看代码Diff<br/>逐行审查]
+        G3 --> G4[添加评论<br/>提问/建议/指出问题]
+        G4 -->|需修改| G5[开发者修复<br/>git add/commit/push]
+        G5 --> G3
+        G4 -->|通过| G6[Approve批准]
+        G6 --> G7[检查CI是否全绿]
+        G7 -->|有失败| G5
+        G7 -->|全通过| G8[点击Merge合并]
+    end
+
+    subgraph 阶段8["8️⃣ 合并后阶段"]
+        H1[代码进入main分支] --> H2[触发部署流水线]
+        H2 --> H3[构建生产包]
+        H3 --> H4[部署到测试环境<br/>Staging]
+        H4 --> H5[人工功能测试<br/>QA验收]
+        H5 -->|不通过| H6[回滚或修复]
+        H6 --> H1
+        H5 -->|通过| H7[人工安全测试]
+        H7 -->|发现问题| H6
+        H7 -->|通过| H8[DAST动态测试<br/>模拟攻击]
+        H8 -->|发现漏洞| H6
+        H8 -->|通过| H9[部署到生产环境<br/>灰度发布]
+    end
+
+    subgraph 阶段9["9️⃣ 生产验证阶段"]
+        I1[生产环境冒烟测试] --> I2[核心接口健康检查]
+        I2 -->|失败| I3[立即回滚<br/>Rollback]
+        I3 --> I4[紧急修复]
+        I4 --> H1
+        I2 -->|通过| I5[监控观察<br/>错误率/响应时间/业务指标]
+        I5 -->|异常| I3
+        I5 -->|正常| I6[全量发布]
+        I6 --> I7[观察期结束<br/>关闭监控告警]
+        I7 --> I8[删除功能分支<br/>git branch -d feature/xxx]
+    end
+
+    阶段1 --> 阶段2
+    阶段2 --> 阶段3
+    阶段3 --> 阶段4
+    阶段4 --> 阶段5
+    阶段5 --> 阶段6
+    阶段6 --> 阶段7
+    阶段7 --> 阶段8
+    阶段8 --> 阶段9
+
+    style 阶段1 fill:#e1f5fe
+    style 阶段2 fill:#e1f5fe
+    style 阶段3 fill:#fff3e0
+    style 阶段4 fill:#fff3e0
+    style 阶段5 fill:#f3e5f5
+    style 阶段6 fill:#e8f5e9
+    style 阶段7 fill:#fce4ec
+    style 阶段8 fill:#e8eaf6
+    style 阶段9 fill:#ffebee
