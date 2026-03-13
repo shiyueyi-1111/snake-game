@@ -1,5 +1,12 @@
 name: 🔍 代码审查流程
 
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+  actions: read
+  checks: read
+  
 on:
   pull_request:
     types: [opened, synchronize, reopened]
