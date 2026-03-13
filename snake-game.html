@@ -151,16 +151,16 @@
             snake.forEach((segment, index) => {
                 if (index === 0) {
                     // 蛇头
-                    ctx.fillStyle = '#000000';
+                    ctx.fillStyle = '#FF69B4';
                 } else {
                     // 蛇身
-                    ctx.fillStyle = '#000000';
+                    ctx.fillStyle = '#FF69B4';
                 }
                 
                 ctx.fillRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
                 
                 // 边框
-                ctx.strokeStyle = '#000000';
+                ctx.strokeStyle = '#C71585';
                 ctx.strokeRect(segment.x * gridSize, segment.y * gridSize, gridSize, gridSize);
             });
             
